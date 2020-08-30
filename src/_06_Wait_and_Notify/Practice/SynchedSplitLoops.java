@@ -16,12 +16,14 @@ printed in order.
 */
 
 public class SynchedSplitLoops {
-	static int counter = 0;
-	
+	private static int counter = 0;
+	private static final Object oneAtATime = new Object();
 	public static void main(String[] args) {
 		Thread t1 = new Thread(() -> {
+			synchronized(oneAtATime) {
 			for(int i = 0; i < 100000; i++) {
 				counter++;
+			}
 			}
 		});
 		

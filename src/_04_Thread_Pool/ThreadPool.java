@@ -1,25 +1,37 @@
 package _04_Thread_Pool;
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ThreadPool {
-	Object[] queue;
+	Thread[] queue;
+	ConcurrentLinkedQueue<Task> tq;
 	public ThreadPool(int i) {
 		// TODO Auto-generated constructor stub
-		queue = new Object[i];
+		queue = new Thread[i];
+		tq = new ConcurrentLinkedQueue<Task>();
+		for(int j = 0; j<queue.length;j++) {
+			queue[j] = new Thread(new Worker(tq));
+		}
 	}
 
-	public void addTask(Object object) {
-		// TODO Auto-generated method stub
-		Object[] temp = new Object[queue.length+1];
-		 for(int i = 0; i<queue.length;i++) {
-			 //temp = temp+queue[i];
-		 }
+	public void addTask(Task t) {
+		tq.add(t);
 	}
 
 	public void start() {
 		// TODO Auto-generated method stub
-		
+		int i = 0;
+		while(i<queue.length) {
+			queue[i].start();
+			try {
+				queue[i].join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			i++;
+		}
 	}
 
 	

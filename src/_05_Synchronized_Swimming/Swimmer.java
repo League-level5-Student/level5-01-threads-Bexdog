@@ -8,14 +8,20 @@ package _05_Synchronized_Swimming;
  * the static takeTurn() method in SynchronizedSwimming.
  */
 public class Swimmer extends Thread {
-	public final String name;
+	public String name;
 
-	public Swimmer(String name) {
-		this.name = name;
+	public Swimmer(String n) {
+		name = n;
 	}
 
 	@Override
 	public void run() {
-		// ...
+		for(int i = 0; i<5;i++) {
+			if(i%2 == 0) {
+				SynchronizedSwimming.takeTurn(this);
+			}
+		}
 	}
+
+	
 }

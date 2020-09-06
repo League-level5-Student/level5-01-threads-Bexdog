@@ -16,32 +16,50 @@ printed in order.
 */
 
 public class SynchedSplitLoops {
-	private static int counter = 0;
-	private static final Object oneAtATime = new Object();
+	static int counter = 0;
+	static Object one = new Object();
+
 	public static void main(String[] args) {
-		Thread t1 = new Thread(() -> {
-			synchronized(oneAtATime) {
-			for(int i = 0; i < 100000; i++) {
-				counter++;
-			}
-			}
-		});
 		
-		Thread t2 = new Thread(() -> {
-			for(int i = 0; i < 100000; i++) {
-				System.out.println(counter);
+			Thread t1 = new Thread(() -> {
+				synchronized (one) {
+				for (int i = 0; i < 100000; i++) {
+					counter++;
+					one.notify();
+					try {
+						one.wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				}
+			});
+
+			Thread t2 = new Thread(() -> {
+				synchronized (one) {
+				for (int i = 0; i < 100000; i++) {
+					System.out.println(counter);
+					one.notify();
+					try {
+						one.wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				}	
+			});
+
+			t1.start();
+			t2.start();
+
+			try {
+				t1.join();
+				t2.join();
+			} catch (InterruptedException e) {
+				System.err.println("Could not join threads");
 			}
-		});
-		
-		t1.start();
-		t2.start();
-		
-		try {
-			t1.join();
-			t2.join();
-		} catch (InterruptedException e) {
-			System.err.println("Could not join threads");
 		}
-		
-	}
+	
 }
